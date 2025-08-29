@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "Superwizard AI",
+  "description": "A chrome extension that executes DOM actions to fulfill natural language commands on any website",
+  "version": "0.0.3",
+  "background": { "service_worker": "background.bundle.js" },
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage",
+    "unlimitedStorage",
+    "sidePanel",
+    "scripting",
+    "commands"
+  ],
+  "omnibox": {
+    "keyword": "wiz"
+  },
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_icon": "icon-34.png"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "icons": {
+    "128": "icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["contentScript.bundle.js"],
+      "css": ["content.styles.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content.styles.css",
+        "icon-128.png",
+        "icon-34.png"
+      ],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+K",
+        "mac": "Command+K"
+      },
+      "description": "Toggle extension side panel"
+    }
+  },
+  "externally_connectable": {
+    "matches": [
+      "file://*/*",
+      "https://www.superwizard.ai/*",
+      "http://localhost:3000/*"
+    ]
+  }
+}

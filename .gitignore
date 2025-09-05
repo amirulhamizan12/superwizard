@@ -1,0 +1,10 @@
+node_modules
+build
+.DS_Store
+.env
+gitpush.sh
+hackathon_about.md
+
+# Lockfiles
+package-lock.json
+commit_history_script.sh

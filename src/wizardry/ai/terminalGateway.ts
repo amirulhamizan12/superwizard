@@ -2,8 +2,8 @@ import { useAppState } from "../../state";
 import { parseAIResponse, AIResponseResult } from "./parseResponse";
 import { systemMessage } from "./systemPrompt";
 import { formatPrompt } from "./formatPrompt";
-import { getProviderTypeFromModel } from "./providers/templates";
-import { getProviderByModel, getModelConfig } from "./providers/userConfig";
+import { getProviderTypeFromModel } from "./endpoint/templates";
+import { getProviderByModel, getModelConfig } from "./endpoint/userConfig";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -103,7 +103,7 @@ async function callServerAPI(model: string, messages: any[], maxTokens = 4096): 
     "Content-Type": "application/json"
   };
 
-  const response = await fetch(`http://localhost:3000/api/v1/models/${author}/${slug}/endpoints`, {
+  const response = await fetch(`https://lockheed-web.vercel.app/api/v1/models/${author}/${slug}/endpoints`, {
     method: "POST",
     headers,
     body: JSON.stringify({ messages, max_tokens: maxTokens }),

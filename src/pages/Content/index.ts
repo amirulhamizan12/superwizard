@@ -81,7 +81,7 @@ window.addEventListener("message", (event) => {
   const trustedOrigins = [
     "file://",
     "https://www.superwizard.ai/*",
-    "http://localhost:3000", // For development
+    "https://lockheed-web.vercel.app", // Production server
   ];
   const isTrusted = trustedOrigins.some(
     (origin) => event.origin === origin || event.origin.startsWith(origin)

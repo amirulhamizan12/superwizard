@@ -4,11 +4,9 @@ import {
   ApiIcon,
   GithubIcon,
   ToolsIcon,
-  SwatchIcon,
   ViewIcon,
   UserCircleIcon,
 } from "../styles/Icons";
-import { HiDocumentPlus, HiChevronRight, HiStar } from "react-icons/hi2";
 import { colors } from "../styles/theme";
 
 const OptionMenu: React.FC<{
@@ -140,51 +138,6 @@ const ToggleSwitch = ({
   </div>
 );
 
-const ToggleGroup = ({
-  options,
-  selected,
-  onSelect,
-}: {
-  options: string[];
-  selected: string;
-  onSelect: (option: string) => void;
-}) => (
-  <div
-    style={{
-      display: "flex",
-      backgroundColor: colors.background.tertiary,
-      borderRadius: "8px",
-      padding: "2px",
-      gap: "2px",
-    }}
-  >
-    {options.map((option) => (
-      <button
-        key={option}
-        onClick={() => onSelect(option)}
-        style={{
-          padding: "6px 16px",
-          border: "none",
-          background:
-            selected === option ? colors.background.card : "transparent",
-          borderRadius: "6px",
-          fontSize: "12px",
-          fontWeight: "500",
-          color: selected === option ? colors.text.primary : colors.text.muted,
-          cursor: "pointer",
-          transition: "all 0.2s ease",
-          minWidth: "65px",
-          boxShadow:
-            selected === option ? "0 1px 2px rgba(0,0,0,0.05)" : "none",
-          fontFamily: "Geist, sans-serif",
-          letterSpacing: "0.06em",
-        }}
-      >
-        {option}
-      </button>
-    ))}
-  </div>
-);
 
 const OptionMenuContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const {
@@ -201,7 +154,6 @@ const OptionMenuContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
     setScreenVisionEnabled: state.settings.actions.setScreenVisionEnabled,
   }));
 
-  const [themeMode, setThemeMode] = useState("Light");
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
 
@@ -259,55 +211,6 @@ const OptionMenuContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
           isOn={!!screenVisionEnabled}
           onToggle={() => setScreenVisionEnabled(!screenVisionEnabled)}
         />
-      ),
-    },
-    {
-      icon: SwatchIcon,
-      text: "Theme",
-      control: (
-        <ToggleGroup
-          options={["Light", "Warm", "Dark"]}
-          selected={themeMode}
-          onSelect={setThemeMode}
-        />
-      ),
-    },
-    {
-      icon: HiDocumentPlus,
-      text: "Agent Mindset",
-      control: (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            color: colors.text.muted,
-            fontSize: "14px",
-            fontFamily: f,
-          }}
-        >
-          <span>None</span>
-          <HiChevronRight size={16} />
-        </div>
-      ),
-    },
-    {
-      icon: HiStar,
-      text: "Custom Instructions",
-      control: (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            color: colors.text.muted,
-            fontSize: "14px",
-            fontFamily: f,
-          }}
-        >
-          <span>None</span>
-          <HiChevronRight size={16} />
-        </div>
       ),
     },
   ];
@@ -392,7 +295,6 @@ const OptionMenuContent: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
                 style={{ display: "flex", alignItems: "center", gap: "12px" }}
               >
                 <Icon
-                  size={20}
                   style={{
                     color: colors.text.muted,
                     width: "20px",

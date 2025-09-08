@@ -13,7 +13,7 @@ export const PROVIDER_TEMPLATES: Record<string, ProviderTemplate> = {
   server: {
     id: "server",
     displayName: "Server API (Authenticated)",
-    baseURL: "http://localhost:3000/api/v1",
+    baseURL: "https://lockheed-web.vercel.app/api/v1",
     apiKeyPlaceholder: "Authenticated via login",
     apiKeyUrl: "#", // No external API key needed
     defaultModels: [

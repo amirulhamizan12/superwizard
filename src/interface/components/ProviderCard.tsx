@@ -5,7 +5,7 @@ import {
   CloseIcon,
   getProviderIcon,
 } from "../styles/Icons";
-import { UserConfiguredProvider } from "../../wizardry/ai/providers/userConfig";
+import { UserConfiguredProvider } from "../../wizardry/ai/endpoint/userConfig";
 import { colors, shadows } from "../styles/theme";
 
 const btnStyle = {

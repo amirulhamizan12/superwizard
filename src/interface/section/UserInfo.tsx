@@ -12,7 +12,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ onBack }) => {
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleOpenDashboard = () => {
-    window.open('http://localhost:3000/dashboard', '_blank');
+    window.open('https://lockheed-web.vercel.app/dashboard', '_blank');
   };
 
   const handleSignOut = () => {
@@ -20,7 +20,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ onBack }) => {
     
     // Open the web app logout page which will handle the sign out
     // and automatically notify the extension
-    window.open('http://localhost:3000/auth/logout', '_blank');
+    window.open('https://lockheed-web.vercel.app/auth/logout', '_blank');
     
     // Reset loading state after a short delay
     setTimeout(() => {

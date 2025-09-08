@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { useAppState } from "../../state";
-import { getAllProviderTemplates, getProviderTemplate } from "../../wizardry/ai/providers/templates";
-import { UserConfiguredProvider, createUserConfiguredModel, getUserConfiguredProviders } from "../../wizardry/ai/providers/userConfig";
+import { getAllProviderTemplates, getProviderTemplate } from "../../wizardry/ai/endpoint/templates";
+import { UserConfiguredProvider, createUserConfiguredModel, getUserConfiguredProviders } from "../../wizardry/ai/endpoint/userConfig";
 import ProviderCard from "../components/ProviderCard";
 import ProviderConfigurationForm from "../components/ProviderForm";
 import AddProviderMenu from "../components/AddProviderMenu";

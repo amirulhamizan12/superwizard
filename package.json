@@ -14,7 +14,6 @@
     "lint": "eslint src/ --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "dom-to-image-more": "^3.6.3",
     "immer": "^9.0.21",
     "lodash": "^4.17.21",
     "react": "19.1.0",

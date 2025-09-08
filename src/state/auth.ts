@@ -117,7 +117,7 @@ export const createAuthSlice: MyStateCreator<AuthSlice> = (set, get) => {
         // Auto-select first authenticated model when user signs in
         if (session) {
           try {
-            const { getAuthenticatedModels } = await import('../wizardry/ai/providers/userConfig');
+            const { getAuthenticatedModels } = await import('../wizardry/ai/endpoint/userConfig');
             const authenticatedModels = getAuthenticatedModels();
             
             if (authenticatedModels.length > 0) {

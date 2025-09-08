@@ -19,7 +19,7 @@ const Onboarding = () => {
   // Function to handle Google sign in navigation
   const handleGoogleSignIn = () => {
     // Open the login page in a new tab
-    window.open('http://localhost:3000/auth/login', '_blank');
+    window.open('https://lockheed-web.vercel.app/auth/login', '_blank');
   };
 
   const handleShowApiConfig = () => {
@@ -27,11 +27,11 @@ const Onboarding = () => {
   };
 
   const handleOpenDashboard = () => {
-    window.open('http://localhost:3000/dashboard', '_blank');
+    window.open('https://lockheed-web.vercel.app/dashboard', '_blank');
   };
 
   const handleSignOut = () => {
-    window.open('http://localhost:3000/auth/logout', '_blank');
+    window.open('https://lockheed-web.vercel.app/auth/logout', '_blank');
   };
 
   // Show loading state

@@ -6,11 +6,11 @@ import React, {
   ReactNode,
 } from "react";
 import { ViewIcon, ViewOffIcon, getProviderIcon } from "../styles/Icons";
-import { getProviderTemplate } from "../../wizardry/ai/providers/templates";
+import { getProviderTemplate } from "../../wizardry/ai/endpoint/templates";
 import {
   validateModelFormat,
   createUserConfiguredModel,
-} from "../../wizardry/ai/providers/userConfig";
+} from "../../wizardry/ai/endpoint/userConfig";
 import { colors, shadows } from "../styles/theme";
 
 const s = {

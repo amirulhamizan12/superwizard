@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { PlusIcon, getProviderIcon } from "../styles/Icons";
-import { ProviderTemplate } from "../../wizardry/ai/providers/templates";
+import { ProviderTemplate } from "../../wizardry/ai/endpoint/templates";
 import { colors } from "../styles/theme";
 
 const btnStyle = {

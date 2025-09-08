@@ -1,7 +1,7 @@
 import React from "react";
 import { useAppState } from "../../state";
-import { getUserConfiguredProviders, getAuthenticatedModels } from "../../wizardry/ai/providers/userConfig";
-import { getModelIconId } from "../../wizardry/ai/providers/templates";
+import { getUserConfiguredProviders, getAuthenticatedModels } from "../../wizardry/ai/endpoint/userConfig";
+import { getModelIconId } from "../../wizardry/ai/endpoint/templates";
 import { getProviderIcon } from "../styles/Icons";
 import { colors } from "../styles/theme";
 

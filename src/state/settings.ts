@@ -1,6 +1,6 @@
 import type { MyStateCreator } from "./index";
-import { PROVIDER_TEMPLATES } from "../wizardry/ai/providers/templates";
-import { UserConfiguredProvider, createUserConfiguredModel } from "../wizardry/ai/providers/userConfig";
+import { PROVIDER_TEMPLATES } from "../wizardry/ai/endpoint/templates";
+import { UserConfiguredProvider, createUserConfiguredModel } from "../wizardry/ai/endpoint/userConfig";
 
 // =============================================================================
 // PROVIDER UTILITIES

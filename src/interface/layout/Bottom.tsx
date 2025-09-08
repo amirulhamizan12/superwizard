@@ -1,7 +1,7 @@
 import React, { useState, useImperativeHandle, useRef, useEffect } from "react";
 import ResizeTextarea from "react-textarea-autosize";
 import { useAppState } from "../../state";
-import { getFriendlyModelName } from "../../wizardry/ai/providers/userConfig";
+import { getFriendlyModelName } from "../../wizardry/ai/endpoint/userConfig";
 import { SettingsIcon, ChevronDownIcon, CloseIcon } from "../styles/Icons";
 import ModelDropdown from "../components/ModelDropdown";
 import { colors, shadows } from "../styles/theme";

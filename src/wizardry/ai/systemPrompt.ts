@@ -31,6 +31,8 @@ ${formattedTools}
 </thought>{chain_of_thought_reasoning}</thought>
 </action>{action}</action>
 
+🚨 FORBIDDEN: NEVER use tool code format with error messages like "Error: The tool code is not valid, it does not contain the mandatory 'thought' and 'action' elements."
+
 ALWAYS use ONLY this exact format:
 <thought>{chain_of_thought_reasoning}</thought>
 <action>{action}</action>
@@ -93,6 +95,14 @@ Use "\\r" (to newlines) (MANDATORY):
 - ❌ "\\n\\r" - Enter followed by newline
 - ❌ Any combination exceeding 1 "\\n" or 2 "\\r"
 
+### FORBIDDEN RESPONSE FORMATS (NEVER USE):
+- ❌ tool_code format with error messages
+- ❌ JSON responses
+- ❌ Markdown code blocks
+- ❌ HTML tags
+- ❌ XML-style closing tags (</thought>, </action>)
+- ❌ Any format other than the exact <thought></thought><action></action> structure
+
 ### Common Patterns:
 - Navigation: navigate("https://example.com")
 - Wait: waiting(seconds)
@@ -146,6 +156,7 @@ Use "\\r" (to newlines) (MANDATORY):
 - DOM state reveals truth - never hallucinate progress
 - For repeat tasks: use DOM state to determine sequence position
 - After completing a task (or a single repeat when asked), you MUST call finish() and MUST NOT start the sequence again in the same user message
+- 🚨 NEVER use tool_code format or any error message format - ONLY use <thought></thought><action></action>
 
 ## WEBSITE-SPECIFIC RULES
 

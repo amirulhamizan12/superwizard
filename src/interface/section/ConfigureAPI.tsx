@@ -172,9 +172,9 @@ const SetAPIKey: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     const allAvailableModels = validProviders.flatMap(provider => provider.models);
     
     // Check if current selected model is available
-    const isSelectedModelAvailable = selectedModel && allAvailableModels.some(model => model.id === selectedModel);
+    const isSelectedModelAvailable = selectedModel && selectedModel !== "Select Model" && allAvailableModels.some(model => model.id === selectedModel);
     
-    if ((!selectedModel || !isSelectedModelAvailable) && validProviders.length > 0) {
+    if ((!selectedModel || selectedModel === "Select Model" || !isSelectedModelAvailable) && validProviders.length > 0) {
       const firstProvider = validProviders[0];
       if (firstProvider.models.length > 0) {
         updateSettings({ selectedModel: firstProvider.models[0].id });

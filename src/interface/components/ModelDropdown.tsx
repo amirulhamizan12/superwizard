@@ -45,9 +45,9 @@ const ModelDropdown = ({ inMenu = false }: { inMenu?: boolean }) => {
     ];
     
     // Check if current selected model is available
-    const isSelectedModelAvailable = selectedModel && allAvailableModels.some(model => model.id === selectedModel);
+    const isSelectedModelAvailable = selectedModel && selectedModel !== "Select Model" && allAvailableModels.some(model => model.id === selectedModel);
     
-    if (!selectedModel || !isSelectedModelAvailable) {
+    if (!selectedModel || selectedModel === "Select Model" || !isSelectedModelAvailable) {
       // Prefer auth models first (if authenticated), then configured providers
       if (isAuthenticated && authenticatedModels.length > 0) {
         updateSettings({ selectedModel: authenticatedModels[0].id });

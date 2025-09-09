@@ -12,240 +12,32 @@ interface EnhancedHistoryEntry extends TaskHistoryEntry {
   timestamp: string;
 }
 
-// ============================================================================
-// ERROR STATUS CARD COMPONENT
-// ============================================================================
-
-interface ErrorStatusCardProps {
-  taskHistory: EnhancedHistoryEntry[];
-}
-
-const ErrorStatusCard: React.FC<ErrorStatusCardProps> = ({ taskHistory }) => {
-  const getErrorInfo = () => {
-    // Get all error entries from task history
-    const errorEntries = taskHistory.filter((entry) => entry.role === "error");
-
-    if (errorEntries.length === 0) {
-      return null;
-    }
-
-    // Get the latest error entry to determine the primary error type
-    const latestError = errorEntries[errorEntries.length - 1];
-
-    // Extract error details from the latest error entry
-    let title = "Task Error";
-    let message = "An error occurred during task execution.";
-    let type: "error" | "warning" = "error";
-
-    if (latestError.action && "name" in latestError.action) {
-      const parsedAction = latestError.action as any;
-
-      // Handle different error types based on action name
-      if (parsedAction.name === "interrupt") {
-        title = "Task Interrupted";
-        type = "warning";
-        message =
-          parsedAction.args?.message ||
-          "The task was stopped before completion. This happens when you click the stop button or close the extension.";
-      } else if (parsedAction.name === "consecutive_failures") {
-        title = "Task Failed - Too Many Consecutive Failures";
-        message =
-          parsedAction.args?.message ||
-          "Task stopped after multiple consecutive failed actions. This usually indicates the page structure has changed or the task requires manual intervention.";
-      } else if (parsedAction.name === "action_failure") {
-        title = "Task Failed - Action Error";
-        message =
-          parsedAction.args?.message ||
-          `Action "${parsedAction.args?.actionName || "unknown"}" failed: ${
-            parsedAction.args?.error || "Unknown error"
-          }`;
-      } else if (parsedAction.name === "ai_failure") {
-        title = "Task Failed";
-        message =
-          parsedAction.args?.message ||
-          "The task was marked as failed by the AI assistant. This usually means the task couldn't be completed as requested.";
-      } else if (parsedAction.name === "system_error") {
-        title = "System Error";
-        message =
-          parsedAction.args?.message ||
-          "A system error occurred during task execution.";
-      }
-    }
-
-    // Collect all error details for the details section
-    const details: string[] = [];
-    errorEntries.forEach((entry, index) => {
-      if (entry.action && "name" in entry.action) {
-        const parsedAction = entry.action as any;
-        const timestamp = new Date(entry.timestamp).toLocaleTimeString();
-
-        if (parsedAction.name === "action_failure") {
-          details.push(
-            `${timestamp} - Action "${
-              parsedAction.args?.actionName || "unknown"
-            }" failed: ${parsedAction.args?.error || "Unknown error"}`
-          );
-        } else if (parsedAction.name === "consecutive_failures") {
-          details.push(
-            `${timestamp} - Too many consecutive failures: ${
-              parsedAction.args?.message ||
-              "Multiple actions failed in sequence"
-            }`
-          );
-        } else if (parsedAction.name === "system_error") {
-          details.push(
-            `${timestamp} - System error: ${
-              parsedAction.args?.message || "Unknown system error"
-            }`
-          );
-        } else if (parsedAction.name === "ai_failure") {
-          details.push(
-            `${timestamp} - AI determined failure: ${
-              parsedAction.args?.message || "Task marked as failed"
-            }`
-          );
-        } else if (parsedAction.name !== "interrupt") {
-          details.push(
-            `${timestamp} - Error: ${
-              parsedAction.args?.message || "Unknown error"
-            }`
-          );
-        }
-      }
-    });
-
-    return {
-      title,
-      message,
-      details: details.length > 0 ? details : [],
-      type,
-    };
-  };
-
-  const errorInfo = getErrorInfo();
-  if (!errorInfo) return null;
-
-  const isError = errorInfo.type === "error";
-  const bgColor = isError
-    ? colors.stateBackground.error
-    : colors.stateBackground.info;
-  const borderColor = isError ? colors.state.error : colors.state.warning;
-  const textColor = isError ? colors.state.error : colors.state.warning;
-
-  return (
-    <div
-      style={{
-        backgroundColor: bgColor,
-        border: `1px solid ${borderColor}`,
-        borderRadius: 12,
-        boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)",
-        marginBottom: 16,
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          padding: "16px 16px 12px",
-          borderBottom: `1px solid ${borderColor}20`,
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            marginBottom: 8,
-            fontFamily: "Geist,sans-serif",
-            fontSize: 14,
-            lineHeight: 1.5,
-            fontWeight: 600,
-            color: textColor,
-          }}
-        >
-          <span>⚠️</span>
-          <span>{errorInfo.title}</span>
-        </div>
-
-        <div
-          style={{
-            fontFamily: "Geist,sans-serif",
-            fontSize: 13,
-            lineHeight: 1.5,
-            color: colors.text.primary,
-            marginBottom: 12,
-          }}
-        >
-          {errorInfo.message}
-        </div>
-
-        {errorInfo.details && errorInfo.details.length > 0 && (
-          <div style={{ marginBottom: 12 }}>
-            <div
-              style={{
-                fontFamily: "Geist,sans-serif",
-                fontSize: 12,
-                lineHeight: 1.4,
-                fontWeight: 600,
-                color: colors.text.secondary,
-                marginBottom: 6,
-                textTransform: "uppercase" as const,
-                letterSpacing: ".05em",
-              }}
-            >
-              Error Details
-            </div>
-            <div
-              style={{
-                backgroundColor: colors.background.secondary,
-                border: `1px solid ${colors.border.light}`,
-                borderRadius: 6,
-                padding: 10,
-                maxHeight: "200px",
-                overflowY: "auto" as const,
-              }}
-            >
-              {errorInfo.details.map((detail, index) => (
-                <div
-                  key={index}
-                  style={{
-                    fontFamily: "Geist Mono,monospace",
-                    fontSize: 11,
-                    lineHeight: 1.4,
-                    color: colors.text.primary,
-                    marginBottom: index < errorInfo.details.length - 1 ? 6 : 0,
-                    paddingBottom: index < errorInfo.details.length - 1 ? 6 : 0,
-                    borderBottom:
-                      index < errorInfo.details.length - 1
-                        ? `1px solid ${colors.border.light}`
-                        : "none",
-                  }}
-                >
-                  {detail}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
 const Spinner = () => (
-  <div style={{ display: "inline-block", height: 18, minWidth: 36 }}>
+  <div style={{ 
+    display: "inline-flex", 
+    alignItems: "center", 
+    gap: 6,
+    height: 19, 
+    minWidth: 38,
+    padding: "4px 8px",
+    borderRadius: 11,
+    backgroundColor: colors.background.secondary,
+    border: `1px solid ${colors.border.light}`,
+  }}>
     <style>{`@keyframes bounce{0%,80%,100%{transform:scale(0.8);opacity:0.5}40%{transform:scale(1.2);opacity:1}}`}</style>
     {[0, 0.2, 0.4].map((d, i) => (
       <span
         key={i}
         style={{
           display: "inline-block",
-          width: 8,
-          height: 8,
-          marginRight: i < 2 ? 4 : 0,
+          width: 6,
+          height: 6,
           borderRadius: "50%",
-          background: colors.primary.main,
+          background: `linear-gradient(135deg, ${colors.primary.main}, ${colors.primary.light})`,
           verticalAlign: "middle",
           animation: `bounce 1.4s infinite ease-in-out both ${d}s`,
+          boxShadow: "none",
         }}
       />
     ))}
@@ -298,11 +90,11 @@ const CollapsibleCodeBlock = ({
           backgroundColor: colors.background.secondary,
           borderBottom: `1px solid ${colors.border.primary}`,
           fontFamily: "Geist, sans-serif",
-          fontSize: 12,
+          fontSize: 11,
           lineHeight: "1.4",
           fontWeight: 500,
           color: colors.text.secondary,
-          letterSpacing: "0.06em",
+          letterSpacing: "0.08em",
         }}
         onClick={() => setCollapsed((c) => !c)}
       >
@@ -314,7 +106,7 @@ const CollapsibleCodeBlock = ({
             cursor: "pointer",
           }}
         >
-          <span style={{ fontWeight: 600 }}>{title}</span>
+          <span style={{ fontWeight: 600, letterSpacing: "0.02em" }}>{title}</span>
           <span
             style={{
               display: "flex",
@@ -324,7 +116,7 @@ const CollapsibleCodeBlock = ({
               opacity: 0.7,
             }}
           >
-            <ChevronDownIcon boxSize="16px" />
+            <ChevronDownIcon boxSize="15px" />
           </span>
         </div>
         <button
@@ -333,7 +125,7 @@ const CollapsibleCodeBlock = ({
             alignItems: "center",
             gap: 4,
             padding: "4px 16px",
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: 500,
             border: "none",
             borderRadius: 4,
@@ -345,14 +137,14 @@ const CollapsibleCodeBlock = ({
           }}
           onClick={handleCopy}
         >
-          {copied ? "Copied" : "Copy"}
+          <span style={{ letterSpacing: "0.02em" }}>{copied ? "Copied" : "Copy"}</span>
         </button>
       </div>
       {!collapsed && (
         <div
           style={{
             fontFamily: "Geist Mono, monospace",
-            fontSize: 12,
+            fontSize: 11,
             lineHeight: "1.5",
             letterSpacing: "0.06em",
             padding: 16,
@@ -391,37 +183,57 @@ const MessageBubble = ({
   message: string;
   isUser: boolean;
 }) => {
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   const processedMessage = isUser
     ? message
     : message.replace(/\\n/g, "\n").replace(/\\r/g, "\r");
+
   return (
     <div
       style={{
         display: "flex",
         justifyContent: isUser ? "flex-end" : "flex-start",
         width: "100%",
-        marginBottom: 20,
+        marginBottom: 23,
+        transform: isVisible ? "translateY(0)" : "translateY(-10px)",
+        opacity: isVisible ? 1 : 0,
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
       <div
         style={{
-          maxWidth: "77%",
-          background: isUser ? colors.primary.main : colors.background.hover,
+          maxWidth: "85%",
+          background: isUser 
+            ? colors.primary.main
+            : colors.background.card,
           color: isUser ? "white" : colors.text.primary,
-          padding: "13px 18px",
-          borderRadius: 20,
-          borderTopRightRadius: isUser ? 7 : 20,
-          borderTopLeftRadius: isUser ? 20 : 7,
-          fontSize: 14,
+          padding: "16px 20px",
+          borderRadius: 23,
+          borderTopRightRadius: isUser ? 8 : 23,
+          borderTopLeftRadius: isUser ? 23 : 8,
+          fontSize: 13,
           whiteSpace: "pre-wrap",
           wordBreak: "break-word",
-          border: isUser ? "none" : `1px solid ${colors.border.primary}`,
-          lineHeight: "1.4",
+          border: isUser 
+            ? "none" 
+            : `1px solid ${colors.border.primary}`,
+          lineHeight: "1.5",
           fontFamily: "Geist, sans-serif",
-          letterSpacing: "0.06em",
+          letterSpacing: "0.02em",
+          boxShadow: "none",
+          position: "relative",
         }}
       >
-        {processedMessage}
+        {/* Message content */}
+        <div>
+          {processedMessage}
+        </div>
       </div>
     </div>
   );
@@ -440,9 +252,16 @@ const Stepper = ({
   }[];
 }) => {
   const [expandedIdx, setExpandedIdx] = React.useState<number | null>(null);
+  const [hoveredIdx, setHoveredIdx] = React.useState<number | null>(null);
+  const [selectedIdx, setSelectedIdx] = React.useState<number | null>(null);
   const dotRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const [lineHeights, setLineHeights] = React.useState<number[]>([]);
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   React.useEffect(() => {
     if (!containerRef.current) return;
@@ -474,178 +293,233 @@ const Stepper = ({
       style={{
         display: "flex",
         flexDirection: "column",
-        marginTop: 8,
-        marginBottom: 8,
+        marginTop: 11,
+        marginBottom: 11,
+        transform: isVisible ? "translateY(0)" : "translateY(-19px)",
+        opacity: isVisible ? 1 : 0,
+        transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
-      {steps.map((step, idx) => (
-        <div
-          key={idx}
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            position: "relative",
-          }}
-        >
+      {steps.map((step, idx) => {
+        const isExpanded = expandedIdx === idx;
+        const isHovered = hoveredIdx === idx;
+        const isSelected = selectedIdx === idx;
+        const isLast = idx === steps.length - 1;
+        
+        return (
           <div
+            key={idx}
             style={{
-              position: "relative",
-              width: 24,
               display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
+              alignItems: "flex-start",
+              position: "relative",
+              marginBottom: isLast ? 0 : 8,
+              padding: 0,
+              borderRadius: 11,
+              backgroundColor: step.hasError
+                ? colors.stateBackground.error
+                : (isHovered || isSelected)
+                  ? colors.background.hover 
+                  : "transparent",
+              border: step.hasError
+                ? `1px solid ${colors.state.error}`
+                : (isHovered || isSelected)
+                  ? `1px solid ${colors.border.light}`
+                  : "1px solid transparent",
+              transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+              cursor: "pointer",
+            }}
+            onMouseEnter={() => setHoveredIdx(idx)}
+            onMouseLeave={() => setHoveredIdx(null)}
+            onClick={() => {
+              setExpandedIdx(isExpanded ? null : idx);
+              setSelectedIdx(isSelected ? null : idx);
             }}
           >
             <div
-              ref={(el) => {
-                dotRefs.current[idx] = el;
-              }}
               style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background: step.hasError
-                  ? colors.state.error
-                  : colors.primary.main,
-                zIndex: 1,
                 position: "relative",
-                margin: 0,
-                marginTop: 6,
+                width: 30,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
+                marginRight: 15,
               }}
-            />
-            {idx < steps.length - 1 && lineHeights[idx] > 0 && (
+            >
+              {/* Step indicator */}
               <div
+                ref={(el) => {
+                  dotRefs.current[idx] = el;
+                }}
                 style={{
-                  position: "absolute",
-                  top: 10,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  width: 2,
-                  height: lineHeights[idx],
+                  width: 11,
+                  height: 11,
+                  borderRadius: "50%",
                   background: step.hasError
                     ? colors.state.error
+                    : step.isStatusStep
+                    ? `linear-gradient(135deg, ${colors.primary.main}, ${colors.primary.light})`
                     : colors.primary.main,
-                  opacity: step.hasError ? 0.3 : 0.13,
-                  borderRadius: 2,
-                  zIndex: 0,
-                }}
-              />
-            )}
-          </div>
-          <div
-            style={{
-              marginLeft: 0,
-              paddingBottom: step.isStatusStep ? 0 : 12,
-              flex: 1,
-              minHeight: 44,
-              minWidth: 0,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                fontWeight: 500,
-                fontSize: 15,
-                color: step.hasError ? colors.state.error : colors.primary.main,
-                fontFamily: "Geist, sans-serif",
-                marginBottom: 2,
-                letterSpacing: "0.06em",
-                wordWrap: "break-word",
-                overflowWrap: "break-word",
-                maxWidth: "100%",
-              }}
-            >
-              {step.title}
-              {step.hasError && (
-                <span style={{ marginLeft: 8, fontSize: 12, opacity: 0.8 }}>
-                  ⚠️
-                </span>
-              )}
-            </div>
-            <div
-              style={{
-                color: step.hasError
-                  ? colors.state.error
-                  : colors.text.secondary,
-                fontSize: 14,
-                fontFamily: "Geist, sans-serif",
-                whiteSpace: "pre-line",
-                letterSpacing: "0.06em",
-                cursor: "default",
-                display: "-webkit-box",
-                WebkitLineClamp: expandedIdx === idx ? "unset" : 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                transition: "all 0.2s",
-                maxWidth: "100%",
-                wordWrap: "break-word",
-                overflowWrap: "break-word",
-              }}
-              onClick={() => setExpandedIdx(expandedIdx === idx ? null : idx)}
-            >
-              {step.description}
-              {step.hasError && step.errorMessage && (
-                <div
-                  style={{
-                    marginTop: 8,
-                    padding: 8,
-                    backgroundColor: colors.stateBackground.error,
-                    borderRadius: 6,
-                    border: `1px solid ${colors.state.error}`,
-                    fontSize: 12,
-                    color: colors.state.error,
-                    fontFamily: "Geist Mono, monospace",
-                  }}
-                >
-                  Error: {step.errorMessage}
-                </div>
-              )}
-              {step.isStatusStep && (
-                <div
-                  style={{
-                    width: "100%",
-                    height: 3,
-                    backgroundColor: colors.border.light,
-                    borderRadius: 2,
-                    overflow: "hidden",
-                    marginTop: 16,
-                  }}
-                >
-                  <div
-                    style={{
-                      height: "100%",
-                      backgroundColor: colors.primary.main,
-                      borderRadius: 2,
-                      animation: "progress 1.5s ease-in-out infinite",
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-            {step.baseUrl && (
-              <div
-                style={{
-                  fontSize: 12,
-                  color: colors.text.tertiary,
-                  marginTop: 4,
-                  wordBreak: "break-all",
-                  overflowWrap: "break-word",
-                  maxWidth: "100%",
-                  hyphens: "auto",
+                  zIndex: 2,
+                  position: "relative",
+                  margin: 0,
+                  marginTop: 8,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "none",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  transform: (isHovered || isSelected) ? "scale(1.1)" : "scale(1)",
                 }}
               >
-                {step.baseUrl}
+                {step.hasError && (
+                  <div
+                    style={{
+                      fontSize: 8,
+                      color: "white",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    !
+                  </div>
+                )}
               </div>
-            )}
+              
+              {/* Connecting line */}
+              {!isLast && lineHeights[idx] > 0 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 19,
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: 2,
+                    height: lineHeights[idx] - 8,
+                    background: step.hasError
+                      ? `linear-gradient(to bottom, ${colors.state.error}40, ${colors.state.error}20)`
+                      : `linear-gradient(to bottom, ${colors.primary.main}40, ${colors.primary.main}20)`,
+                    borderRadius: 1,
+                    zIndex: 1,
+                    opacity: (isHovered || isSelected) ? 1 : 0.6,
+                    transition: "opacity 0.3s ease",
+                  }}
+                />
+              )}
+            </div>
+            
+            {/* Step content */}
+            <div
+              style={{
+                flex: 1,
+                minHeight: 42,
+                minWidth: 0,
+                overflow: "hidden",
+                padding: "8px 0",
+              }}
+            >
+              <div
+                style={{
+                  fontWeight: 600,
+                  fontSize: 14,
+                  color: step.hasError 
+                    ? colors.state.error 
+                    : step.isStatusStep
+                    ? colors.primary.main
+                    : colors.text.primary,
+                  fontFamily: "Geist, sans-serif",
+                  marginBottom: 4,
+                  letterSpacing: "0.02em",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
+                  maxWidth: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <span>{step.title}</span>
+              </div>
+              
+              <div
+                style={{
+                  color: step.hasError
+                    ? colors.state.error
+                    : colors.text.secondary,
+                  fontSize: 13,
+                  fontFamily: "Geist, sans-serif",
+                  whiteSpace: "pre-line",
+                  letterSpacing: "0.02em",
+                  display: "-webkit-box",
+                  WebkitLineClamp: isExpanded ? "unset" : 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  maxWidth: "100%",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
+                  lineHeight: 1.5,
+                  paddingRight: 11,
+                }}
+              >
+                {step.description}
+                
+                
+              </div>
+              
+              {step.baseUrl && (
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: colors.text.tertiary,
+                    marginTop: 8,
+                    wordBreak: "break-all",
+                    overflowWrap: "break-word",
+                    maxWidth: "100%",
+                    hyphens: "auto",
+                    fontFamily: "Geist Mono, monospace",
+                    padding: "4px 12px 4px 8px",
+                    backgroundColor: step.hasError 
+                      ? colors.stateBackground.error 
+                      : (isHovered || isSelected)
+                        ? colors.background.hover 
+                        : colors.background.secondary,
+                    borderRadius: 6,
+                    border: `1px solid ${colors.border.light}`,
+                    transition: step.hasError ? "none" : "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
+                  {step.baseUrl}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
+};
+
+const getTaskStatusText = (taskStatus: string, actionStatus: string): string => {
+  if (taskStatus === "running") {
+    const statusMessages: Record<string, string> = {
+      initializing: "Initializing Task",
+      "pulling-dom": "Analyzing Page",
+      "performing-query": "Planning Action",
+      "performing-action": "Executing Action",
+    };
+    return statusMessages[actionStatus] || "Task in Progress";
+  }
+  
+  const statusTexts: Record<string, string> = {
+    idle: "Completed",
+    completed: "Task Completed",
+    success: "Task Successful",
+    failed: "Task Failed",
+    error: "Task Error",
+  };
+  
+  return statusTexts[taskStatus] || "Task Execution";
 };
 
 const MessageCard = ({
@@ -653,12 +527,25 @@ const MessageCard = ({
   timestamp,
   statusStep,
   currentUrl,
+  taskStatus,
+  actionStatus,
 }: {
   steps: EnhancedHistoryEntry[];
   timestamp: string;
   statusStep?: { title: string; description: string };
   currentUrl: string;
+  taskStatus: string;
+  actionStatus: string;
 }) => {
+  const [isVisible, setIsVisible] = React.useState(false);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 200);
+    return () => clearTimeout(timer);
+  }, []);
+
   const stepperSteps: {
     title: string;
     description: string;
@@ -676,8 +563,15 @@ const MessageCard = ({
       hasError = true;
       errorMessage = entry.content || "Task was interrupted";
       description = errorMessage;
+      
+      // Check if it's a Task Error action
+      let title = "Task Interrupted";
+      if (entry.action && "name" in entry.action && entry.action.name === "Task Error") {
+        title = "Task Error";
+      }
+      
       return {
-        title: "Task Interrupted",
+        title,
         description,
         baseUrl: currentUrl,
         hasError,
@@ -730,71 +624,88 @@ const MessageCard = ({
   return (
     <div
       style={{
-        backgroundColor: colors.background.hover,
-        border: `1px solid ${
-          hasAnyErrors ? colors.state.error : colors.border.primary
-        }`,
-        borderRadius: 12,
-        marginBottom: 16,
+        backgroundColor: colors.background.card,
+        border: `1px solid ${colors.border.primary}`,
+        borderRadius: 19,
+        marginBottom: 19,
         overflow: "hidden",
-        transition: "all 0.2s ease-in-out",
+        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         alignSelf: "flex-start",
         marginRight: "auto",
-        maxWidth: "min(500px, 100%)",
+        maxWidth: "min(570px, 100%)",
         width: "100%",
         boxSizing: "border-box",
+        transform: isVisible ? "translateY(0)" : "translateY(-19px)",
+        opacity: isVisible ? 1 : 0,
+        boxShadow: "none",
+        backdropFilter: "blur(10px)",
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {hasAnyErrors && (
+      {/* Collapsible Header */}
+      <div
+        style={{
+          padding: "16px",
+          backgroundColor: colors.background.secondary,
+          borderBottom: "none",
+          position: "relative",
+          cursor: "pointer",
+          transition: "all 0.2s ease",
+        }}
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
         <div
           style={{
-            padding: "8px 13px",
-            backgroundColor: colors.stateBackground.error,
-            borderBottom: `1px solid ${colors.state.error}`,
-            fontSize: 12,
-            color: colors.state.error,
-            fontWeight: 500,
-            fontFamily: "Geist, sans-serif",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          ⚠️ Some steps encountered errors
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 11,
+            }}
+          >
+            {taskStatus === "running" && <Spinner />}
+            <span
+              style={{
+                fontFamily: "Geist, sans-serif",
+                fontSize: 14,
+                fontWeight: 600,
+                color: colors.text.primary,
+                letterSpacing: "0.02em",
+              }}
+            >
+              {getTaskStatusText(taskStatus, actionStatus)}
+            </span>
+          </div>
+          
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <ChevronDownIcon 
+              boxSize="17px" 
+              style={{
+                transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+                transition: "transform 0.2s ease",
+                color: colors.text.secondary,
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      {!isCollapsed && (
+        <div style={{ padding: "12px" }}>
+          <Stepper steps={stepperSteps} />
         </div>
       )}
-      <div style={{ padding: "13px 13px 6px 13px" }}>
-        <Stepper steps={stepperSteps} />
-      </div>
     </div>
   );
 };
 
-const SessionDivider = ({ timestamp }: { timestamp?: string }) => (
-  <div
-    style={{ display: "flex", alignItems: "center", margin: "32px 0", gap: 16 }}
-  >
-    <div
-      style={{ flex: 1, height: 1, backgroundColor: colors.border.primary }}
-    />
-    {timestamp && (
-      <div
-        style={{
-          fontFamily: "Geist, sans-serif",
-          fontSize: 12,
-          lineHeight: "1.4",
-          fontWeight: 500,
-          color: colors.text.tertiary,
-          backgroundColor: colors.background.primary,
-          padding: "0 16px",
-          letterSpacing: "0.06em",
-        }}
-      >
-        {new Date(timestamp).toLocaleString()}
-      </div>
-    )}
-    <div
-      style={{ flex: 1, height: 1, backgroundColor: colors.border.primary }}
-    />
-  </div>
-);
 
 const TaskHistory = () => {
   const taskHistory = useAppState((state) =>
@@ -905,10 +816,10 @@ const TaskHistory = () => {
   });
 
   const statusMessages: Record<string, string> = {
-    initializing: "Starting task...",
-    "pulling-dom": "Analyzing page content...",
-    "performing-query": "Planning next action...",
-    "performing-action": "Executing action...",
+    initializing: "Starting task",
+    "pulling-dom": "Analyzing page content",
+    "performing-query": "Planning next action",
+    "performing-action": "Executing action",
   };
 
   return (
@@ -918,15 +829,24 @@ const TaskHistory = () => {
         flexDirection: "column",
         alignItems: "stretch",
         width: "100%",
-        maxWidth: 600,
+        maxWidth: 665,
         margin: "0 auto",
-        padding: "24px 16px",
+        padding: "32px 20px",
         backgroundColor: colors.background.primary,
         overflowY: "auto",
         minHeight: 0,
+        position: "relative",
       }}
     >
-      <style>{`@keyframes spin{100%{transform:rotate(360deg)}}@keyframes progress{0%{width:0%;margin-left:0%}50%{width:75%;margin-left:25%}100%{width:0%;margin-left:100%}}`}</style>
+      <style>{`
+        @keyframes spin{100%{transform:rotate(360deg)}}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.7;transform:scale(1.05)}}
+        @keyframes fadeInDown{0%{opacity:0;transform:translateY(-20px)}100%{opacity:1;transform:translateY(0)}}
+        @keyframes slideInRight{0%{opacity:0;transform:translateX(20px)}100%{opacity:1;transform:translateX(0)}}
+        @keyframes slideInLeft{0%{opacity:0;transform:translateX(-20px)}100%{opacity:1;transform:translateX(0)}}
+        @keyframes bounce{0%,80%,100%{transform:scale(0.8);opacity:0.5}40%{transform:scale(1.2);opacity:1}}
+        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+      `}</style>
       {sessionGroups.map((session, sessionIndex) => {
         const isLastSession = sessionIndex === sessionGroups.length - 1;
         const showStatusStep = isLastSession && taskStatus === "running";
@@ -936,10 +856,12 @@ const TaskHistory = () => {
         });
 
         return (
-          <div key={`session-${sessionIndex}`}>
-            {sessionIndex > 0 && (
-              <SessionDivider timestamp={session.user.timestamp} />
-            )}
+          <div 
+            key={`session-${sessionIndex}`}
+            style={{
+              animation: `fadeInDown 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${sessionIndex * 0.1}s both`,
+            }}
+          >
             <MessageBubble
               message={extractUserMessage(
                 session.user.prompt,
@@ -963,6 +885,8 @@ const TaskHistory = () => {
                     : undefined
                 }
                 currentUrl={currentUrl}
+                taskStatus={taskStatus}
+                actionStatus={actionStatus}
               />
             )}
             {session.aiSteps
@@ -979,17 +903,17 @@ const TaskHistory = () => {
                   aiMessage = args.message || Object.values(args).join(" ");
                 if (!aiMessage && step.aiResponse) aiMessage = step.aiResponse;
                 return (
-                  <MessageBubble key={idx} message={aiMessage} isUser={false} />
+                  <MessageBubble 
+                    key={idx} 
+                    message={aiMessage} 
+                    isUser={false} 
+                  />
                 );
               })}
           </div>
         );
       })}
 
-      {/* Show error status at the bottom if there are errors or interruptions */}
-      {enhancedHistory.some((entry) => entry.role === "error") && (
-        <ErrorStatusCard taskHistory={enhancedHistory} />
-      )}
     </div>
   );
 };

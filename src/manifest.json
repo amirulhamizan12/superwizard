@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "Superwizard AI - ",
+  "description": "Bring Superwizard with you across the web for instant answers, smarter suggestions, and help with tasks",
+  "version": "0.0.5",
+  "background": { "service_worker": "background.bundle.js" },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "unlimitedStorage",
+    "sidePanel",
+    "scripting",
+    "commands"
+  ],
+  "omnibox": {
+    "keyword": "wiz"
+  },
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_icon": "icon-34.png"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "icons": {
+    "34": "icon-34.png",
+    "128": "icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["contentScript.bundle.js"],
+      "css": ["content.styles.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content.styles.css",
+        "icon-34.png",
+        "icon-128.png"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+K",
+        "mac": "Command+K"
+      }
+    }
+  },
+  "externally_connectable": {
+    "matches": [
+      "https://www.superwizard.ai/*",
+      "file://*/*"
+    ]
+  }
+}

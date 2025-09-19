@@ -1,0 +1,78 @@
+/* ============================================================================
+   SUPERWIZARD CONTENT STYLES
+   ============================================================================ */
+   
+/* Cursor Container */
+#superwizard-cursor-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2147483647;
+  overflow: visible;
+}
+
+#superwizard-cursor-svg {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, left, top, opacity;
+  overflow: visible;
+}
+
+/* Border Effect Container */
+#superwizard-border-effect-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2147483646;
+}
+
+.superwizard-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  box-sizing: border-box;
+  will-change: opacity, filter;
+}
+
+.superwizard-overlay::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: inherit;
+  filter: blur(3px);
+  opacity: 0.3;
+  z-index: -1;
+  animation: superwizard-glow-pulse 3s ease-in-out infinite alternate;
+}
+
+/* Animations */
+@keyframes superwizard-glow-pulse {
+  0% { opacity: 0.3; filter: brightness(1) blur(0px); }
+  50% { opacity: 0.5; filter: brightness(1.2) blur(1px); }
+  100% { opacity: 0.4; filter: brightness(1.1) blur(0.5px); }
+}
+
+/* Accessibility Support */
+@media (prefers-contrast: high) {
+  #superwizard-cursor-svg circle[fill] { stroke-width: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #superwizard-cursor-svg, #superwizard-cursor-svg *,
+  .superwizard-overlay, .superwizard-overlay::before {
+    transition: none !important;
+    animation: none !important;
+  }
+}
